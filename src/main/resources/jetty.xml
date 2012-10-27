@@ -1,0 +1,22 @@
+<?xml version="1.0"  encoding="ISO-8859-1"?>
+<!DOCTYPE Configure PUBLIC
+        "-//Mort Bay Consulting//DTD Configure 1.2//EN"
+        "http://jetty.mortbay.org/configure_1_2.dtd">
+
+<Configure class="org.mortbay.jetty.Server">
+    <Call name="addConnector">
+        <Arg>
+            <New id="connector" class="org.mortbay.jetty.nio.SelectChannelConnector">
+                <Set name="port">
+                    <SystemProperty name="SERVER_PORT" default="7171"/>
+                </Set>
+                <Set name="maxIdleTime">30000</Set>
+                <Set name="Acceptors">2</Set>
+                <Set name="statsOn">false</Set>
+                <Set name="confidentialPort">8443</Set>
+                <Set name="responseBufferSize">65536</Set>
+                <Set name="headerBufferSize">32768</Set>
+            </New>
+        </Arg>
+    </Call>
+</Configure>
