@@ -5,6 +5,7 @@ import static org.apache.hadoop.hbase.util.Bytes.toBytes;
 public interface ApplicationConstants {
     interface HBaseTableNames {
         byte[] LOG_TABLE = toBytes("log_table");
+        String LOG_TABLE_STRING = "log_table";
     }
 
     interface LogColumnFamily {
