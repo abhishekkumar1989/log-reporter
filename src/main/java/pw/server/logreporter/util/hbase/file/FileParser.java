@@ -2,7 +2,7 @@ package pw.server.logreporter.util.hbase.file;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pw.server.logreporter.util.hbase.mongolog.writer.HBaseLogger;
+import pw.server.logreporter.service.mongolog.writer.HBaseLogWriter;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -14,10 +14,10 @@ import static pw.server.logreporter.util.NullChecker.isNull;
 @Service
 public class FileParser {
 
-    private HBaseLogger hBaseLogger;
+    private HBaseLogWriter hBaseLogger;
 
     @Autowired
-    public FileParser(HBaseLogger hBaseLogger) {
+    public FileParser(HBaseLogWriter hBaseLogger) {
         this.hBaseLogger = hBaseLogger;
     }
 

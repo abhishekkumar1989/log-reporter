@@ -7,7 +7,7 @@
     <context:property-placeholder location="classpath:database.properties"/>
     <context:annotation-config/>
 
-    <bean id="hBaseConfig" class="pw.server.logreporter.util.hbase.HBaseConfig">
+    <bean id="hBaseConfig" class="pw.server.logreporter.service.HBaseConfig">
         <constructor-arg type="java.lang.String" value="${hbase.zookeper.quorum}" />
         <constructor-arg type="java.lang.String" value="${hbase.zookeeper.property.clientPort}" />
         <constructor-arg type="java.lang.String" value="${hbase.master}" />

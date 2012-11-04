@@ -8,10 +8,10 @@ import org.springframework.web.context.request.NativeWebRequest;
 //@Component
 public class MetaTokenArgumentResolver implements WebArgumentResolver {
 
-//    private HBaseLogger hBaseLogger;
+//    private HBaseLogWriter hBaseLogger;
 
 //    @Autowired
-//    public MetaTokenArgumentResolver(HBaseLogger hBaseLogger) {
+//    public MetaTokenArgumentResolver(HBaseLogWriter hBaseLogger) {
 //        this.hBaseLogger = hBaseLogger;
 //    }
 
