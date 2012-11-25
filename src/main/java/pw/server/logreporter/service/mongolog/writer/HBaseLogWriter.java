@@ -23,6 +23,7 @@ import static org.apache.hadoop.hbase.util.Bytes.toBytes;
 import static pw.server.logreporter.util.ApplicationConstants.ColumnFamily.*;
 import static pw.server.logreporter.util.ApplicationConstants.HBaseTableNames.T_ERROR_COUNTER;
 import static pw.server.logreporter.util.ApplicationConstants.HBaseTableNames.T_LOG_TABLE;
+import static pw.server.logreporter.util.ApplicationConstants.HBaseTableNames.T_NEW_LOG_TABLE;
 import static pw.server.logreporter.util.Helper.getDailyQualifier;
 import static pw.server.logreporter.util.Helper.getMonthQualifier;
 import static pw.server.logreporter.util.Helper.getYearQualifier;
@@ -47,7 +48,8 @@ public class HBaseLogWriter {
     public HBaseLogWriter(HTableLoggerPool hTableLoggerPool) {
         this.hTableLoggerPool = hTableLoggerPool;
     }
-    public void insertLogMessage(String logMessage) {
+
+    public void insertNewLogMessage(String logMessage) {
         if (isNotNull(logMessage) && isNotEmpty(logMessage)) {
             put(logMessage);
         }
@@ -65,7 +67,7 @@ public class HBaseLogWriter {
 
     private void addRowDetails(Put put, String logMessage, Date date) {
         if (isNotNull(date))
-            put.add(CF_LOG_DETAILS, toBytes(date.getTime()), toBytes(logMessage));
+            put.add(CF_LOG_DETAILS, toBytes(""), date.getTime(), toBytes(logMessage));
         else {
             Logger.getLogger("Ignoring the logMessage [ " + logMessage + " ] because of no time-stamp");
         }
@@ -86,7 +88,7 @@ public class HBaseLogWriter {
 
     private void insert(Put put, Date date) {
         // TODO : Everytime opening and closing the connection, which is not good
-        HTableInterface logTable = hTableLoggerPool.getTable(T_LOG_TABLE);
+        HTableInterface logTable = hTableLoggerPool.getTable(T_NEW_LOG_TABLE);
         try {
             logTable.put(put);
             incrementCounter(date, put.getRow());

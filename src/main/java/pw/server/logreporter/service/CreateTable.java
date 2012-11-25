@@ -34,7 +34,8 @@ public class CreateTable {
         try {
             hBaseAdmin = new HBaseAdmin(config);
             dropAll(hBaseAdmin);
-            createLogTable(hBaseAdmin);
+            createNewLogTable(hBaseAdmin);
+//            createLogTable(hBaseAdmin);
 //            createDetailTable(hBaseAdmin);
             createCounterTable(hBaseAdmin);
         } catch (MasterNotRunningException e) {
@@ -53,12 +54,31 @@ public class CreateTable {
 
     private void dropAll(HBaseAdmin hBaseAdmin) {
         try {
-            hBaseAdmin.disableTable(T_LOG_TABLE);
+            hBaseAdmin.disableTable(T_NEW_LOG_TABLE);
             hBaseAdmin.disableTable(T_ERROR_COUNTER);
-            hBaseAdmin.deleteTable(T_LOG_TABLE);
+            hBaseAdmin.deleteTable(T_NEW_LOG_TABLE);
             hBaseAdmin.deleteTable(T_ERROR_COUNTER);
         } catch (IOException e) {
             Logger.getLogger(getClass()).error("Error in dropping the previous table");
+        }
+    }
+
+    private void createNewLogTable(HBaseAdmin hBaseAdmin) {
+        try {
+            if (!hBaseAdmin.tableExists(T_NEW_LOG_TABLE)) {
+                HTableDescriptor tableDescriptor = new HTableDescriptor(T_NEW_LOG_TABLE);
+                HColumnDescriptor hColumnDescriptor = new HColumnDescriptor(CF_LOG_DETAILS);
+                hColumnDescriptor.setCompressionType(Compression.Algorithm.GZ);
+                hColumnDescriptor.setBloomFilterType(StoreFile.BloomType.ROW);
+                hColumnDescriptor.setMaxVersions(Integer.MAX_VALUE);
+                tableDescriptor.addFamily(hColumnDescriptor);
+                tableDescriptor.setMaxFileSize(10000);
+                tableDescriptor.setDeferredLogFlush(true);
+                hBaseAdmin.createTable(tableDescriptor);
+                Logger.getLogger(getClass()).info("The table descriptor set is [ " + hBaseAdmin.getTableDescriptor(T_LOG_TABLE) + " ]");
+            }
+        } catch (IOException e) {
+            Logger.getLogger(getClass()).info("Error in creating table " + T_LOG_TABLE_STRING + " Not Running");
         }
     }
 

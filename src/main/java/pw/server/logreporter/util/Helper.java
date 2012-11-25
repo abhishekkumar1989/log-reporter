@@ -1,7 +1,5 @@
 package pw.server.logreporter.util;
 
-import org.apache.hadoop.hbase.util.Bytes;
-
 import java.util.Calendar;
 import java.util.Date;
 
@@ -16,14 +14,19 @@ public class Helper {
     }
 
     public static byte[] getYearQualifier(int year) {
-        return toBytes(year);
+        return toBytes(Integer.toString(year));
     }
 
     public static byte[] getDailyQualifier(Calendar instance) {
-        return toBytes(instance.get(Calendar.YEAR)*10000 + instance.get(Calendar.MONTH)*100 + instance.get(Calendar.DATE));
+        return toBytes(getDateParam(instance, Calendar.YEAR) + "-" + getDateParam(instance, Calendar.MONTH) + "-" + getDateParam(instance, Calendar.DATE));
     }
 
     public static byte[] getMonthQualifier(Calendar instance) {
-        return toBytes(instance.get(Calendar.YEAR)*100 + instance.get(Calendar.MONTH));
+        return toBytes(getDateParam(instance, Calendar.YEAR) + "-" + getDateParam(instance, Calendar.MONTH));
+    }
+
+    private static String getDateParam(Calendar instance, int type) {
+        String param = Integer.toString(instance.get(type));
+        return param.length() == 1 ? "0" + param : param;
     }
 }

@@ -5,6 +5,7 @@ import static org.apache.hadoop.hbase.util.Bytes.toBytes;
 public interface ApplicationConstants {
     interface HBaseTableNames {
         byte[] T_LOG_TABLE = toBytes("log_table");
+        byte[] T_NEW_LOG_TABLE = toBytes("new_log_table");
         byte[] T_ERROR_DETAILS = toBytes("error_details");
         byte[] T_ERROR_COUNTER = toBytes("error_count");
         String T_LOG_TABLE_STRING = "log_table";

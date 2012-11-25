@@ -27,7 +27,7 @@ public class FileParser {
         BufferedReader reader = new BufferedReader(new FileReader(path));
         String strLine;
         while (isNotNull(strLine = reader.readLine())) {
-            hBaseLogger.insertLogMessage(strLine);
+            hBaseLogger.insertNewLogMessage(strLine);
         }
     }
 

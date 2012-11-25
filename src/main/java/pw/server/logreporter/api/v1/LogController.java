@@ -3,7 +3,6 @@ package pw.server.logreporter.api.v1;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -25,7 +24,6 @@ public class LogController extends BaseController {
     private HBaseReader reader;
     private static final long defaultMillis = 2592000000L;
     private static final long defaultMins = 1440L;
-    private static final int defaultVersions = 1;
     private static final long minsToMillis = 60000;
 
     @Autowired
@@ -42,24 +40,12 @@ public class LogController extends BaseController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/get_row")
-    public Map<String, Map> getRowDetails(@RequestParam(value = "row_key", required = false) String rowKey) throws IOException {
-        return reader.getRowDetails(rowKey);
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "/get_rows")
-    public Object getSortedRowResults(@RequestParam(value = "row_key", required = false) String rowKey,
-                                      @RequestParam(value = "mins_back", required = false) final Long mins) throws IOException {
-        return reader.scanRowInOrder(rowKey, isNull(mins) ? defaultMins : mins);
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "/get_raw_row")
+    @RequestMapping(value = "/get_error_details")
     public Map<String, String> getRawRowDetails(@RequestParam(value = "row_key", required = false) String rowKey,
-                                                @RequestParam(value = "mins_back", required = false) final Long mins,
+                                                @RequestParam(value = "start_time", required = false) final Long start_mins,
+                                                @RequestParam(value = "stop_time", required = false) final Long stop_mins,
                                                 @RequestParam(value = "versions", required = false) final Integer versions) throws IOException {
-        Map<String, String> rawDatas = reader.getRawDatas(rowKey, isNull(mins) ? defaultMillis : mins * minsToMillis, isNull(versions) ? defaultVersions : versions);
+        Map<String, String> rawDatas = reader.getRangeResults(rowKey, isNull(start_mins) ? defaultMillis : start_mins * minsToMillis, stop_mins, isNull(versions) ? Integer.MAX_VALUE : versions);
         Logger.getLogger(getClass()).debug("Responding with the result");
         return rawDatas;
     }
