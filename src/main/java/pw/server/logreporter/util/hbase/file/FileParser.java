@@ -23,7 +23,7 @@ public class FileParser {
 
     public void statFileLogger(String path) throws IOException {
         if (isNull(path))
-            path = "r1.log";
+            path = "r2.log";
         BufferedReader reader = new BufferedReader(new FileReader(path));
         String strLine;
         while (isNotNull(strLine = reader.readLine())) {
