@@ -6,9 +6,9 @@ public interface ApplicationConstants {
     interface HBaseTableNames {
         byte[] T_LOG_TABLE = toBytes("log_table");
         byte[] T_NEW_LOG_TABLE = toBytes("new_log_table");
-        byte[] T_ERROR_DETAILS = toBytes("error_details");
         byte[] T_ERROR_COUNTER = toBytes("error_count");
         String T_LOG_TABLE_STRING = "log_table";
+        String T_NEW_LOG_TABLE_STRING = "log_table";
         String T_ERROR_COUNTER_STRING = "log_table";
     }
 
@@ -19,10 +19,10 @@ public interface ApplicationConstants {
         byte[] CF_COUNTER_DAILY = toBytes("d");
     }
 
-    interface LogDetailFamilyQualifier {
-        byte[] Q_DETAIL_FAMILY_MESSAGE_QUALIFIER = toBytes("m");
-
-//        byte[] Q_DETAIL_FAMILY_MESSAGE_QUALIFIER = toBytes("m");
-//        byte[] Q_DETAIL_FAMILY_MESSAGE_QUALIFIER = toBytes("m");
+    interface ReportingType {
+        String MONTHLY = "monthly";
+        String DAILY = "daily";
+        String YEARLY = "yearly";
     }
+
 }

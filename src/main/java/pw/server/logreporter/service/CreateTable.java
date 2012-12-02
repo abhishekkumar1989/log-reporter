@@ -1,19 +1,19 @@
 package pw.server.logreporter.service;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hbase.*;
+import org.apache.hadoop.hbase.HColumnDescriptor;
+import org.apache.hadoop.hbase.HTableDescriptor;
+import org.apache.hadoop.hbase.MasterNotRunningException;
+import org.apache.hadoop.hbase.ZooKeeperConnectionException;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.apache.hadoop.hbase.io.hfile.Compression;
 import org.apache.hadoop.hbase.regionserver.StoreFile;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pw.server.logreporter.service.coprocessor.ExampleUserCoprocessor;
 
 import java.io.IOException;
-import java.util.Collections;
 
 import static pw.server.logreporter.util.ApplicationConstants.ColumnFamily.*;
 import static pw.server.logreporter.util.ApplicationConstants.HBaseTableNames.*;
@@ -33,7 +33,7 @@ public class CreateTable {
         HBaseAdmin hBaseAdmin = null;
         try {
             hBaseAdmin = new HBaseAdmin(config);
-            dropAll(hBaseAdmin);
+//            dropAll(hBaseAdmin);
             createNewLogTable(hBaseAdmin);
 //            createLogTable(hBaseAdmin);
 //            createDetailTable(hBaseAdmin);
@@ -75,10 +75,10 @@ public class CreateTable {
                 tableDescriptor.setMaxFileSize(10000);
                 tableDescriptor.setDeferredLogFlush(true);
                 hBaseAdmin.createTable(tableDescriptor);
-                Logger.getLogger(getClass()).info("The table descriptor set is [ " + hBaseAdmin.getTableDescriptor(T_LOG_TABLE) + " ]");
+                Logger.getLogger(getClass()).info("The table descriptor set is [ " + hBaseAdmin.getTableDescriptor(T_NEW_LOG_TABLE) + " ]");
             }
         } catch (IOException e) {
-            Logger.getLogger(getClass()).info("Error in creating table " + T_LOG_TABLE_STRING + " Not Running");
+            Logger.getLogger(getClass()).info("Error in creating table [ " + T_NEW_LOG_TABLE_STRING + " ] Not Running");
         }
     }
 

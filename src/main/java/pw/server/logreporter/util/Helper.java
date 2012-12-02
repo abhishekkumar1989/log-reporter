@@ -13,7 +13,8 @@ public class Helper {
         return new Date().getTime() - minsBefore * millisInAMin;
     }
 
-    public static byte[] getYearQualifier(int year) {
+    public static byte[] getYearQualifier(Calendar instance) {
+        int year = instance.get(Calendar.YEAR);
         return toBytes(Integer.toString(year));
     }
 

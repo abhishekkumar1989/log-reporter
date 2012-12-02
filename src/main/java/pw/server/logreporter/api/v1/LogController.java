@@ -41,19 +41,28 @@ public class LogController extends BaseController {
 
     @ResponseBody
     @RequestMapping(value = "/get_error_details")
-    public Map<String, String> getRawRowDetails(@RequestParam(value = "row_key", required = false) String rowKey,
-                                                @RequestParam(value = "start_time", required = false) final Long start_mins,
-                                                @RequestParam(value = "stop_time", required = false) final Long stop_mins,
-                                                @RequestParam(value = "versions", required = false) final Integer versions) throws IOException {
-        Map<String, String> rawDatas = reader.getRangeResults(rowKey, isNull(start_mins) ? defaultMillis : start_mins * minsToMillis, stop_mins, isNull(versions) ? Integer.MAX_VALUE : versions);
+    public Map<String, String> getErrorDetails(@RequestParam(value = "row_key", required = false) String rowKey,
+                                               @RequestParam(value = "start_time", required = false) final Long start_mins,
+                                               @RequestParam(value = "stop_time", required = false) final Long stop_mins,
+                                               @RequestParam(value = "value", required = false) final String text,
+                                               @RequestParam(value = "versions", required = false) final Integer versions) throws IOException {
+        Map<String, String> rawDatas = reader.getErrorResults(rowKey, text, isNull(start_mins) ? defaultMillis : start_mins * minsToMillis, stop_mins, isNull(versions) ? Integer.MAX_VALUE : versions);
         Logger.getLogger(getClass()).debug("Responding with the result");
         return rawDatas;
     }
 
     @ResponseBody
     @RequestMapping(value = "/get_counter")
-    public Object getCounter(@RequestParam(value = "row_key", required = true) String rowKey) throws IOException {
-        return reader.getCounts(rowKey);
+    public Object getCounter(@RequestParam(value = "row_key", required = true) String rowKey,
+                             @RequestParam(value = "type", required = false) String type,
+                             @RequestParam(value = "cf", required = false) String colQualifier) throws IOException {
+        return reader.getCounts(rowKey, type, colQualifier);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/all_error_details")
+    public Object getAllErrorCounter(@RequestParam(value = "type", required = false) String type) throws IOException {
+        return reader.getAllCounters(isNull(type) ? "monthly" : type);
     }
 
 

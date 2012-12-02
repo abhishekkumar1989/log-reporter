@@ -111,7 +111,7 @@ public class HBaseLogWriter {
         HTableInterface logTable = hTableLoggerPool.getTable(T_ERROR_COUNTER);
         try {
             Increment increment = new Increment(rowKey)
-                    .addColumn(CF_COUNTER_YEARLY, getYearQualifier(instance.get(Calendar.YEAR)), 1)
+                    .addColumn(CF_COUNTER_YEARLY, getYearQualifier(instance), 1)
                     .addColumn(CF_COUNTER_MONTHLY, getMonthQualifier(instance), 1)
                     .addColumn(CF_COUNTER_DAILY, getDailyQualifier(instance), 1);
             // Result is returned, its better not to return anything
