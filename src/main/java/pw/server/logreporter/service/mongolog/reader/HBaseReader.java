@@ -40,14 +40,14 @@ public class HBaseReader {
         this.pool = pool;
     }
 
-    public Map<String, String> getErrorResults(String rowKey, String text, long minTS, long maxTS, int versions) throws IOException {
+    public Map<String, String> getErrorResults(String rowKey, String text, long minMillisTS, long maxMillisTS, int versions) throws IOException {
         Get get = new Get(toBytes(rowKey));
         get.addFamily(CF_LOG_DETAILS);
         get.setMaxVersions(versions);
-        get.setTimeRange(getTimeStamp(minTS), getTimeStamp(maxTS));
+        get.setTimeRange(getTimeStamp(minMillisTS), getTimeStamp(maxMillisTS));
         if (isNotNull(text))
             get.setFilter(getValueSearchFilter(text));
-        List<KeyValue> errorList = pool.getTable(T_NEW_LOG_TABLE).get(get).getColumn(CF_LOG_DETAILS, Bytes.toBytes(""));
+        List<KeyValue> errorList = pool.getTable(T_NEW_LOG_TABLE).get(get).getColumn(CF_LOG_DETAILS, toBytes(""));
         if (isNotNull(errorList)) {
             Map<String, String> qualifiers = new HashMap<String, String>(errorList.size());
             for (KeyValue kv : errorList) {
