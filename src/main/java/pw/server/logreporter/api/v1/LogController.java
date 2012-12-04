@@ -14,6 +14,7 @@ import pw.server.logreporter.service.mongolog.reader.HBaseReader;
 import java.io.IOException;
 import java.util.Map;
 
+import static java.lang.Integer.MAX_VALUE;
 import static pw.server.logreporter.util.NullChecker.isNull;
 
 @Controller("logController1_0")
@@ -46,7 +47,7 @@ public class LogController extends BaseController {
                                                @RequestParam(value = "stop_time", required = false) final Long stop_mins,
                                                @RequestParam(value = "value", required = false) final String text,
                                                @RequestParam(value = "versions", required = false) final Integer versions) throws IOException {
-        Map<String, String> rawDatas = reader.getErrorResults(rowKey, text, isNull(start_mins) ? defaultMillis : start_mins * minsToMillis, stop_mins * minsToMillis, isNull(versions) ? Integer.MAX_VALUE : versions);
+        Map<String, String> rawDatas = reader.getErrorResults(rowKey, text, isNull(start_mins) ? defaultMillis : start_mins * minsToMillis, stop_mins * minsToMillis, isNull(versions) ? MAX_VALUE : versions);
         Logger.getLogger(getClass()).debug("Responding with the result");
         return rawDatas;
     }
