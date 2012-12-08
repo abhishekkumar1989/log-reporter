@@ -14,11 +14,10 @@ import pw.server.logreporter.util.Helper;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
+import static java.util.Calendar.getInstance;
+import static java.util.TimeZone.getTimeZone;
 import static org.apache.hadoop.hbase.util.Bytes.toBytes;
 import static pw.server.logreporter.util.ApplicationConstants.ColumnFamily.*;
 import static pw.server.logreporter.util.ApplicationConstants.HBaseTableNames.T_ERROR_COUNTER;
@@ -37,7 +36,7 @@ public class HBaseLogWriter {
     // range query will be faster
     // version has to be the highest
 
-    private static final int CURRENT_YEAR = Calendar.getInstance().get(Calendar.YEAR);
+    private static final int CURRENT_YEAR = getInstance().get(Calendar.YEAR);
 
     // rowKey  // cf   // cf
     // TODO : it should be like, a key with list of probably values like, { assertion : [User, Server], Server Restarted : [ no_values ],
@@ -75,8 +74,9 @@ public class HBaseLogWriter {
 
     private Date getDate(String dateString) {
         SimpleDateFormat format = new SimpleDateFormat("EEE MMM d HH:mm:ss");
+
         try {
-            Calendar instance = Calendar.getInstance();
+            Calendar instance = getInstance(getTimeZone("GMT"));
             instance.setTime(format.parse(dateString));
             instance.set(Calendar.YEAR, CURRENT_YEAR);
             return instance.getTime();
@@ -106,7 +106,7 @@ public class HBaseLogWriter {
     }
 
     private void incrementCounter(Date date, byte[] rowKey) {
-        Calendar instance = Calendar.getInstance();
+        Calendar instance = getInstance(getTimeZone("GMT"));
         instance.setTime(date);
         HTableInterface logTable = hTableLoggerPool.getTable(T_ERROR_COUNTER);
         try {

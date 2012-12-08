@@ -18,16 +18,16 @@ public class Helper {
         return toBytes(Integer.toString(year));
     }
 
-    public static byte[] getDailyQualifier(Calendar instance) {
-        return toBytes(getDateParam(instance, Calendar.YEAR) + "-" + getDateParam(instance, Calendar.MONTH) + "-" + getDateParam(instance, Calendar.DATE));
+    public static byte[] getDailyQualifier(Calendar instance) {                           // its because giving 1 less value
+        return toBytes(getDateParam(instance.get(Calendar.YEAR)) + "-" + getDateParam(instance.get(Calendar.MONTH) + 1) + "-" + getDateParam(instance.get(Calendar.DATE)));
     }
 
     public static byte[] getMonthQualifier(Calendar instance) {
-        return toBytes(getDateParam(instance, Calendar.YEAR) + "-" + getDateParam(instance, Calendar.MONTH));
+        return toBytes(getDateParam(instance.get(Calendar.YEAR)) + "-" + getDateParam(instance.get(Calendar.MONTH) + 1));
     }
 
-    private static String getDateParam(Calendar instance, int type) {
-        String param = Integer.toString(instance.get(type));
+    private static String getDateParam(int typeValue) {
+        String param = Integer.toString(typeValue);
         return param.length() == 1 ? "0" + param : param;
     }
 }

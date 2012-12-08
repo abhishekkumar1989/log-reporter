@@ -14,6 +14,8 @@ import pw.server.logreporter.service.HTableLoggerPool;
 import java.io.IOException;
 import java.util.*;
 
+import static java.util.Calendar.getInstance;
+import static java.util.TimeZone.getTimeZone;
 import static org.apache.hadoop.hbase.util.Bytes.toBytes;
 import static pw.server.logreporter.util.ApplicationConstants.ColumnFamily.*;
 import static pw.server.logreporter.util.ApplicationConstants.HBaseTableNames.T_ERROR_COUNTER;
@@ -63,7 +65,9 @@ public class HBaseReader {
     }
 
     private long getTimeStamp(long ts) {
-        return new Date().getTime() - ts;
+        Calendar calendar = getInstance(getTimeZone("GMT"));
+        return calendar.getTimeInMillis() - ts;
+//        return calendar.add(Calendar.MINUTE, );
     }
 
     public Object getCounts(String rowKey, String type, String colQualifier) throws IOException {
@@ -71,7 +75,7 @@ public class HBaseReader {
         Get get = new Get(toBytes(rowKey));
         if (isNotNull(type))
             get.addFamily(typeMapping.get(type));
-        if(isNotNull(colQualifier))
+        if (isNotNull(colQualifier))
             get.setFilter(getColQualifierFilter(type, colQualifier));
         Result result = table.get(get);
         if (!result.isEmpty()) {
@@ -100,13 +104,13 @@ public class HBaseReader {
         Map<String, Object> result = new HashMap<String, Object>();
         ResultScanner scanner = pool.getTable(T_ERROR_COUNTER).getScanner(typeMapping.get(type), getTypeQualifier(type));
         for (Result rs : scanner) {
-            result.put( Bytes.toString(rs.getRow()), getCountMap(rs.getFamilyMap(typeMapping.get(type))));
+            result.put(Bytes.toString(rs.getRow()), getCountMap(rs.getFamilyMap(typeMapping.get(type))));
         }
         return result;
     }
 
     private byte[] getTypeQualifier(String type) {
-        Calendar instance = Calendar.getInstance();
+        Calendar instance = getInstance();
         return type.equals(MONTHLY) ? getMonthQualifier(instance) : type.equals(YEARLY) ? getYearQualifier(instance) : getDailyQualifier(instance);
     }
 }
