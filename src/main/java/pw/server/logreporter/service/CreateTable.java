@@ -33,7 +33,7 @@ public class CreateTable {
         HBaseAdmin hBaseAdmin = null;
         try {
             hBaseAdmin = new HBaseAdmin(config);
-            dropAll(hBaseAdmin);
+//            dropAll(hBaseAdmin);
             createNewLogTable(hBaseAdmin);
 //            createLogTable(hBaseAdmin);
 //            createDetailTable(hBaseAdmin);

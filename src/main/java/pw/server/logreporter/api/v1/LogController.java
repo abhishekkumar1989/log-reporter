@@ -42,14 +42,12 @@ public class LogController extends BaseController {
 
     @ResponseBody
     @RequestMapping(value = "/get_error_details")
-    public Map<String, String> getErrorDetails(@RequestParam(value = "row_key", required = false) String rowKey,
-                                               @RequestParam(value = "start_time", required = false) final Long start_mins,
-                                               @RequestParam(value = "stop_time", required = false) final Long stop_mins,
-                                               @RequestParam(value = "value", required = false) final String text,
-                                               @RequestParam(value = "versions", required = false) final Integer versions) throws IOException {
-        Map<String, String> rawDatas = reader.getErrorResults(rowKey, text, isNull(start_mins) ? defaultMillis : start_mins * minsToMillis, stop_mins * minsToMillis, isNull(versions) ? MAX_VALUE : versions);
-        Logger.getLogger(getClass()).debug("Responding with the result");
-        return rawDatas;
+    public Object getErrorDetails(@RequestParam(value = "row_key", required = false) String rowKey,
+                                  @RequestParam(value = "start_time", required = false) final Long start_mins,
+                                  @RequestParam(value = "stop_time", required = false) final Long stop_mins,
+                                  @RequestParam(value = "value", required = false) final String text,
+                                  @RequestParam(value = "versions", required = false) final Integer versions) throws IOException {
+        return reader.getErrorResults(rowKey, text, isNull(start_mins) ? defaultMillis : start_mins * minsToMillis, stop_mins * minsToMillis, isNull(versions) ? MAX_VALUE : versions);
     }
 
         @ResponseBody

@@ -21,7 +21,6 @@ import static pw.server.logreporter.util.ApplicationConstants.ColumnFamily.*;
 import static pw.server.logreporter.util.ApplicationConstants.HBaseTableNames.T_ERROR_COUNTER;
 import static pw.server.logreporter.util.ApplicationConstants.HBaseTableNames.T_NEW_LOG_TABLE;
 import static pw.server.logreporter.util.ApplicationConstants.ReportingType.*;
-import static pw.server.logreporter.util.Helper.*;
 import static pw.server.logreporter.util.NullChecker.isNotNull;
 
 @Service
@@ -42,7 +41,7 @@ public class HBaseReader {
         this.pool = pool;
     }
 
-    public Map<String, String> getErrorResults(String rowKey, String text, long minMillisTS, long maxMillisTS, int versions) throws IOException {
+    public Object getErrorResults(String rowKey, String text, long minMillisTS, long maxMillisTS, int versions) throws IOException {
         Get get = new Get(toBytes(rowKey));
         get.addFamily(CF_LOG_DETAILS);
         get.setMaxVersions(versions);
@@ -51,13 +50,20 @@ public class HBaseReader {
             get.setFilter(getValueSearchFilter(text));
         List<KeyValue> errorList = pool.getTable(T_NEW_LOG_TABLE).get(get).getColumn(CF_LOG_DETAILS, toBytes(""));
         if (isNotNull(errorList)) {
-            Map<String, String> qualifiers = new HashMap<String, String>(errorList.size());
+            List<Map<String, String>> results = new ArrayList<Map<String, String>>(errorList.size());
             for (KeyValue kv : errorList) {
-                qualifiers.put(new Date(kv.getTimestamp()).toString(), Bytes.toString(kv.getValue()));
+                results.add(getErrorMap(kv));
             }
-            return qualifiers;
+            return results;
         }
         return Collections.singletonMap("Result", "No result found");
+    }
+
+    private Map<String, String> getErrorMap(KeyValue kv) {
+        HashMap<String, String> errorMap = new HashMap<String, String>(2);
+        errorMap.put("date", new Date(kv.getTimestamp()).toString());
+        errorMap.put("error", Bytes.toString(kv.getValue()));
+        return errorMap;
     }
 
     private Filter getValueSearchFilter(String text) {
@@ -67,7 +73,6 @@ public class HBaseReader {
     private long getTimeStamp(long ts) {
         Calendar calendar = getInstance(getTimeZone("GMT"));
         return calendar.getTimeInMillis() - ts;
-//        return calendar.add(Calendar.MINUTE, );
     }
 
     public Object getCounts(String rowKey, String type, String colQualifier) throws IOException {
@@ -79,10 +84,10 @@ public class HBaseReader {
             get.setFilter(getColQualifierFilter(type, colQualifier));
         Result result = table.get(get);
         if (!result.isEmpty()) {
-            Map<String, Map> resultCount = new LinkedHashMap<String, Map>(3);
-            resultCount.put("year", getCountMap(result.getFamilyMap(CF_COUNTER_YEARLY)));
-            resultCount.put("month", getCountMap(result.getFamilyMap(CF_COUNTER_MONTHLY)));
-            resultCount.put("day", getCountMap(result.getFamilyMap(CF_COUNTER_DAILY)));
+            Map<String, List> resultCount = new HashMap<String, List>(3);
+            resultCount.put("year", getCountList(result.getFamilyMap(CF_COUNTER_YEARLY).descendingMap()));
+            resultCount.put("month", getCountList(result.getFamilyMap(CF_COUNTER_MONTHLY).descendingMap()));
+            resultCount.put("day", getCountList(result.getFamilyMap(CF_COUNTER_DAILY).descendingMap()));
             return resultCount;
         }
         return Collections.singletonMap("Result", "No counter-result found for the searched key");
@@ -92,25 +97,28 @@ public class HBaseReader {
         return new ColumnPrefixFilter(toBytes(colQualifier));
     }
 
-    private Map<String, Long> getCountMap(NavigableMap<byte[], byte[]> familyMap) {
-        Map<String, Long> result = new LinkedHashMap<String, Long>();
+    private List<Map<String, Object>> getCountList(NavigableMap<byte[], byte[]> familyMap) {
+        List<Map<String, Object>> countListMap = new ArrayList<Map<String, Object>>();
         for (Map.Entry<byte[], byte[]> map : familyMap.entrySet()) {
-            result.put(Bytes.toString(map.getKey()), Bytes.toLong(map.getValue()));
+            countListMap.add(getMapCount(map));
         }
+        return countListMap;
+    }
+
+    private Map<String, Object> getMapCount(Map.Entry<byte[], byte[]> map) {
+        HashMap<String, Object> result = new HashMap<String, Object>(2);
+        result.put("type", Bytes.toString(map.getKey()));
+        result.put("value", Bytes.toLong(map.getValue()));
         return result;
     }
 
     public Object getAllCounters(String type) throws IOException {
-        Map<String, Object> result = new HashMap<String, Object>();
-        ResultScanner scanner = pool.getTable(T_ERROR_COUNTER).getScanner(typeMapping.get(type), getTypeQualifier(type));
+        Map<String, List> result = new HashMap<String, List>();
+        ResultScanner scanner = pool.getTable(T_ERROR_COUNTER).getScanner(typeMapping.get(type));
         for (Result rs : scanner) {
-            result.put(Bytes.toString(rs.getRow()), getCountMap(rs.getFamilyMap(typeMapping.get(type))));
+            result.put(Bytes.toString(rs.getRow()), getCountList(rs.getFamilyMap(typeMapping.get(type)).descendingMap()));
         }
         return result;
     }
 
-    private byte[] getTypeQualifier(String type) {
-        Calendar instance = getInstance();
-        return type.equals(MONTHLY) ? getMonthQualifier(instance) : type.equals(YEARLY) ? getYearQualifier(instance) : getDailyQualifier(instance);
-    }
 }
