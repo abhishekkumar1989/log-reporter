@@ -40,7 +40,7 @@ public class HBaseLogWriter {
 
     // rowKey  // cf   // cf
     // TODO : it should be like, a key with list of probably values like, { assertion : [User, Server], Server Restarted : [ no_values ],
-    private final List<String> errorRowKeys = Arrays.asList("DBClientInterface", "assertion", "User Assertion", "SocketException", "DBClientCursor", "DBClientBase", "OutOfMemoryException", "IndexOutOfBoundsException");
+    private final List<String> errorRowKeys = Arrays.asList("DBClientInterface", "assertion", "User Assertion", "memory leak", "SocketException", "DBClientCursor", "DBClientBase", "OutOfMemoryException", "IndexOutOfBoundsException");
     private HTableLoggerPool hTableLoggerPool;
 
     @Autowired
