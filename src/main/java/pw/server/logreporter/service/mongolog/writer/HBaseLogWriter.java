@@ -1,6 +1,5 @@
 package pw.server.logreporter.service.mongolog.writer;
 
-import org.apache.hadoop.hbase.Coprocessor;
 import org.apache.hadoop.hbase.client.HTableInterface;
 import org.apache.hadoop.hbase.client.Increment;
 import org.apache.hadoop.hbase.client.Put;
@@ -9,39 +8,33 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pw.server.logreporter.service.HTableLoggerPool;
-import pw.server.logreporter.util.Helper;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 import static java.util.Calendar.getInstance;
 import static java.util.TimeZone.getTimeZone;
 import static org.apache.hadoop.hbase.util.Bytes.toBytes;
 import static pw.server.logreporter.util.ApplicationConstants.ColumnFamily.*;
 import static pw.server.logreporter.util.ApplicationConstants.HBaseTableNames.T_ERROR_COUNTER;
-import static pw.server.logreporter.util.ApplicationConstants.HBaseTableNames.T_LOG_TABLE;
 import static pw.server.logreporter.util.ApplicationConstants.HBaseTableNames.T_NEW_LOG_TABLE;
-import static pw.server.logreporter.util.Helper.getDailyQualifier;
-import static pw.server.logreporter.util.Helper.getMonthQualifier;
-import static pw.server.logreporter.util.Helper.getYearQualifier;
+import static pw.server.logreporter.util.Helper.*;
 import static pw.server.logreporter.util.NullChecker.isNotEmpty;
 import static pw.server.logreporter.util.NullChecker.isNotNull;
 
 @Service
 public class HBaseLogWriter {
 
-    // rowKey=error-type, cf=d, cq='', timestamp=error-time, value=error-message
-    // range query will be faster
-    // version has to be the highest
-
+    // TODO
     private static final int CURRENT_YEAR = getInstance().get(Calendar.YEAR);
-
-    // rowKey  // cf   // cf
-    // TODO : it should be like, a key with list of probably values like, { assertion : [User, Server], Server Restarted : [ no_values ],
     private final List<String> errorRowKeys = Arrays.asList("DBClientInterface", "assertion", "User Assertion", "memory leak", "SocketException", "DBClientCursor", "DBClientBase", "OutOfMemoryException", "IndexOutOfBoundsException");
     private HTableLoggerPool hTableLoggerPool;
+    private long lastMillisParsed;
 
     @Autowired
     public HBaseLogWriter(HTableLoggerPool hTableLoggerPool) {
